@@ -1,3 +1,26 @@
+## control_toolbox (melodic) - 1.19.0-1
+
+The packages in the `control_toolbox` repository were released into the `melodic` distro by running `/usr/local/bin/bloom-release --track melodic --rosdistro melodic control_toolbox` on `Tue, 10 May 2022 10:06:19 -0000`
+
+The `control_toolbox` package was released.
+
+Version of package(s) in repository `control_toolbox`:
+
+- upstream repository: https://github.com/ros-controls/control_toolbox.git
+- release repository: https://github.com/ros-gbp/control_toolbox-release.git
+- rosdistro version: `1.18.2-1`
+- old version: `1.18.2-1`
+- new version: `1.19.0-1`
+
+Versions of tools used:
+
+- bloom version: `0.10.7`
+- catkin_pkg version: `0.4.24`
+- rosdep version: `0.19.0`
+- rosdistro version: `0.8.3`
+- vcstools version: `0.1.42`
+
+
 ## control_toolbox (noetic) - 1.19.0-1
 
 The packages in the `control_toolbox` repository were released into the `noetic` distro by running `/usr/local/bin/bloom-release --track noetic --rosdistro noetic control_toolbox` on `Tue, 10 May 2022 09:44:52 -0000`
