@@ -34,11 +34,14 @@
 
 /** \author Mrinal Kalakrishnan */
 
-#ifndef CONTROL_TOOLBOX__SINUSOID_HPP_
-#define CONTROL_TOOLBOX__SINUSOID_HPP_
+#ifndef CONTROL_TOOLBOX__SINUSOID_H_
+#define CONTROL_TOOLBOX__SINUSOID_H_
+
+#include <tinyxml.h>
 
 namespace control_toolbox
 {
+
 /**
  * \class Sinusoid
  * \brief A basic sine class
@@ -71,6 +74,14 @@ public:
   virtual ~Sinusoid();
 
   /**
+   * \brief Initializes the parameters of the sine wave from the given xml element
+   *
+   * \param ti_xml_element This XML element needs to contain the following attributes: offset, amplitude, frequency, phase
+   * \return true if successful, false if not
+   */
+  bool initXml(TiXmlElement *ti_xml_element);
+
+  /**
    * Prints the parameters of the sine wave to stdout (for debugging)
    */
   void debug();
@@ -83,15 +94,15 @@ public:
    * \param qdd (output) Second derivative of the sine wave
    * \return The sampled value of the sine wave
    */
-  double update(double time, double & qd, double & qdd);
+  double update(double time, double& qd, double& qdd);
 
 private:
-  double offset_;    /**< DC offset of the sine wave. */
-  double amplitude_; /**< Amplitude of the sine wave. */
-  double frequency_; /**< Frequency of the sine wave. */
-  double phase_;     /**< Phase of the sine wave at t=0. */
+  double offset_;               /**< DC offset of the sine wave. */
+  double amplitude_;            /**< Amplitude of the sine wave. */
+  double frequency_;            /**< Frequency of the sine wave. */
+  double phase_;                /**< Phase of the sine wave at t=0. */
 };
 
-}  // namespace control_toolbox
+}
 
-#endif  // CONTROL_TOOLBOX__SINUSOID_HPP_
+#endif /* SINUSOID_H_ */
