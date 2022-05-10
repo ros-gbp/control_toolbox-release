@@ -190,17 +190,24 @@ void Pid::initDynamicReconfig(ros::NodeHandle &node)
   updateDynamicReconfig();
 
   // Set callback
-  param_reconfig_callback_ = boost::bind(&Pid::dynamicReconfigCallback, this, _1, _2);
+  param_reconfig_callback_ = std::bind(&Pid::dynamicReconfigCallback, this, std::placeholders::_1, std::placeholders::_2);
   param_reconfig_server_->setCallback(param_reconfig_callback_);
 }
 
 void Pid::reset()
 {
+  reset(0.0, 0.0);
+  valid_p_error_last_ = true;
+}
+
+void Pid::reset(double d_error, double i_error)
+{
   p_error_last_ = 0.0;
   p_error_ = 0.0;
-  i_error_ = 0.0;
-  d_error_ = 0.0;
+  i_error_ = i_error;
+  d_error_ = d_error;
   cmd_ = 0.0;
+  valid_p_error_last_ = false;
 }
 
 void Pid::getGains(double &p, double &i, double &d, double &i_max, double &i_min)
@@ -306,8 +313,11 @@ double Pid::computeCommand(double error, ros::Duration dt)
   // Calculate the derivative error
   if (dt.toSec() > 0.0)
   {
-    error_dot = (error - p_error_last_) / dt.toSec();
+    if (valid_p_error_last_) {
+      error_dot = (error - p_error_last_) / dt.toSec();
+    }
     p_error_last_ = error;
+    valid_p_error_last_ = true;
   }
 
   return computeCommand(error, error_dot, dt);
