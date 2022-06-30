@@ -30,47 +30,38 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// Original version: Kevin Watts <watts@willowgarage.com>
+#ifndef CONTROL_TOOLBOX__VISIBILITY_CONTROL_HPP_
+#define CONTROL_TOOLBOX__VISIBILITY_CONTROL_HPP_
 
-#include <algorithm>
-#include <limits>
-#include <random>
+// This logic was borrowed (then namespaced) from the examples on the gcc wiki:
+//     https://gcc.gnu.org/wiki/Visibility
 
-#include "control_toolbox/dither.hpp"
+#if defined _WIN32 || defined __CYGWIN__
+  #ifdef __GNUC__
+    #define CONTROL_TOOLBOX_EXPORT __attribute__ ((dllexport))
+    #define CONTROL_TOOLBOX_IMPORT __attribute__ ((dllimport))
+  #else
+    #define CONTROL_TOOLBOX_EXPORT __declspec(dllexport)
+    #define CONTROL_TOOLBOX_IMPORT __declspec(dllimport)
+  #endif
+  #ifdef CONTROL_TOOLBOX_BUILDING_LIBRARY
+    #define CONTROL_TOOLBOX_PUBLIC CONTROL_TOOLBOX_EXPORT
+  #else
+    #define CONTROL_TOOLBOX_PUBLIC CONTROL_TOOLBOX_IMPORT
+  #endif
+  #define CONTROL_TOOLBOX_PUBLIC_TYPE CONTROL_TOOLBOX_PUBLIC
+  #define CONTROL_TOOLBOX_LOCAL
+#else
+  #define CONTROL_TOOLBOX_EXPORT __attribute__ ((visibility("default")))
+  #define CONTROL_TOOLBOX_IMPORT
+  #if __GNUC__ >= 4
+    #define CONTROL_TOOLBOX_PUBLIC __attribute__ ((visibility("default")))
+    #define CONTROL_TOOLBOX_LOCAL  __attribute__ ((visibility("hidden")))
+  #else
+    #define CONTROL_TOOLBOX_PUBLIC
+    #define CONTROL_TOOLBOX_LOCAL
+  #endif
+  #define CONTROL_TOOLBOX_PUBLIC_TYPE
+#endif
 
-namespace control_toolbox
-{
-Dither::Dither()
-: amplitude_(0), has_saved_value_(false) {}
-
-double Dither::update()
-{
-  if (has_saved_value_) {
-    has_saved_value_ = false;
-    return saved_value_;
-  }
-
-  // Generates gaussian random noise using the polar method.
-  double v1, v2, r;
-  // uniform distribution on the interval [-1.0, 1.0]
-  std::uniform_real_distribution<double> distribution(
-    -1.0, std::nextafter(1.0, std::numeric_limits<double>::max()));
-  for (int i = 0; i < 100; ++i) {
-    v1 = distribution(generator_);
-    v2 = distribution(generator_);
-    r = v1 * v1 + v2 * v2;
-    if (r <= 1.0) {
-      break;
-    }
-  }
-  r = std::min(r, 1.0);
-
-  double f = sqrt(-2.0 * log(r) / r);
-  double current = amplitude_ * f * v1;
-  saved_value_ = amplitude_ * f * v2;
-  has_saved_value_ = true;
-
-  return current;
-}
-
-}  // namespace control_toolbox
+#endif  // CONTROL_TOOLBOX__VISIBILITY_CONTROL_HPP_

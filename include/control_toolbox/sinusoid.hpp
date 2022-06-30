@@ -30,47 +30,66 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// Original version: Kevin Watts <watts@willowgarage.com>
+/** \author Mrinal Kalakrishnan */
 
-#include <algorithm>
-#include <limits>
-#include <random>
-
-#include "control_toolbox/dither.hpp"
+#ifndef CONTROL_TOOLBOX__SINUSOID_HPP_
+#define CONTROL_TOOLBOX__SINUSOID_HPP_
 
 namespace control_toolbox
 {
-Dither::Dither()
-: amplitude_(0), has_saved_value_(false) {}
-
-double Dither::update()
+/**
+ * \class Sinusoid
+ * \brief A basic sine class
+ *
+ * This class calculates the output for a sine wave and its derivatives, given the amplitude,
+ * phase, frequency and offset.<br>
+ *
+ */
+class Sinusoid
 {
-  if (has_saved_value_) {
-    has_saved_value_ = false;
-    return saved_value_;
-  }
+public:
+  /**
+   * \brief Constructor
+   */
+  Sinusoid();
 
-  // Generates gaussian random noise using the polar method.
-  double v1, v2, r;
-  // uniform distribution on the interval [-1.0, 1.0]
-  std::uniform_real_distribution<double> distribution(
-    -1.0, std::nextafter(1.0, std::numeric_limits<double>::max()));
-  for (int i = 0; i < 100; ++i) {
-    v1 = distribution(generator_);
-    v2 = distribution(generator_);
-    r = v1 * v1 + v2 * v2;
-    if (r <= 1.0) {
-      break;
-    }
-  }
-  r = std::min(r, 1.0);
+  /**
+   * \brief Constructor which initializes values
+   *
+   * \param offset A DC offset to be added to the sine wave
+   * \param amplitude Amplitude of the sine wave
+   * \param frequency Frequency of the sine wave
+   * \param phase Phase (in radians) of the sine wave at t=0
+   */
+  Sinusoid(double offset, double amplitude, double frequency, double phase);
 
-  double f = sqrt(-2.0 * log(r) / r);
-  double current = amplitude_ * f * v1;
-  saved_value_ = amplitude_ * f * v2;
-  has_saved_value_ = true;
+  /**
+   * Destructor
+   */
+  virtual ~Sinusoid();
 
-  return current;
-}
+  /**
+   * Prints the parameters of the sine wave to stdout (for debugging)
+   */
+  void debug();
+
+  /**
+   * \brief Gets the value and derivatives of the sinusoid at a given time
+   *
+   * \param time Time at which to sample the sine wave
+   * \param qd (output) The derivative of the sine wave
+   * \param qdd (output) Second derivative of the sine wave
+   * \return The sampled value of the sine wave
+   */
+  double update(double time, double & qd, double & qdd);
+
+private:
+  double offset_;    /**< DC offset of the sine wave. */
+  double amplitude_; /**< Amplitude of the sine wave. */
+  double frequency_; /**< Frequency of the sine wave. */
+  double phase_;     /**< Phase of the sine wave at t=0. */
+};
 
 }  // namespace control_toolbox
+
+#endif  // CONTROL_TOOLBOX__SINUSOID_HPP_

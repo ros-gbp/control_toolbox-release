@@ -1,4 +1,4 @@
-// Copyright (c) 2009, Willow Garage, Inc.
+// Copyright (c) 2008, Willow Garage, Inc.
 // All rights reserved.
 //
 // Software License Agreement (BSD License 2.0)
@@ -30,47 +30,29 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// Original version: Kevin Watts <watts@willowgarage.com>
+#ifndef CONTROL_TOOLBOX__FILTERS_HPP_
+#define CONTROL_TOOLBOX__FILTERS_HPP_
 
 #include <algorithm>
-#include <limits>
-#include <random>
 
-#include "control_toolbox/dither.hpp"
-
-namespace control_toolbox
+namespace filters
 {
-Dither::Dither()
-: amplitude_(0), has_saved_value_(false) {}
-
-double Dither::update()
+/** Clamp value a between b and c */
+/// @note replace with std::clamp once its supported
+template<typename T>
+static inline const T & clamp(const T & a, const T & b, const T & c)
 {
-  if (has_saved_value_) {
-    has_saved_value_ = false;
-    return saved_value_;
-  }
-
-  // Generates gaussian random noise using the polar method.
-  double v1, v2, r;
-  // uniform distribution on the interval [-1.0, 1.0]
-  std::uniform_real_distribution<double> distribution(
-    -1.0, std::nextafter(1.0, std::numeric_limits<double>::max()));
-  for (int i = 0; i < 100; ++i) {
-    v1 = distribution(generator_);
-    v2 = distribution(generator_);
-    r = v1 * v1 + v2 * v2;
-    if (r <= 1.0) {
-      break;
-    }
-  }
-  r = std::min(r, 1.0);
-
-  double f = sqrt(-2.0 * log(r) / r);
-  double current = amplitude_ * f * v1;
-  saved_value_ = amplitude_ * f * v2;
-  has_saved_value_ = true;
-
-  return current;
+  return std::min<T>(std::max<T>(b, a), c);
 }
 
-}  // namespace control_toolbox
+/** Exponential smoothing filter. Alpha is between 0 and 1.
+ * Values closer to 0 weight the last smoothed value more heavily */
+
+static inline double exponentialSmoothing(
+  double current_raw_value, double last_smoothed_value, double alpha)
+{
+  return alpha * current_raw_value + (1 - alpha) * last_smoothed_value;
+}
+}  // namespace filters
+
+#endif  // CONTROL_TOOLBOX__FILTERS_HPP_"
