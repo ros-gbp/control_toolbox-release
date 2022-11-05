@@ -2,6 +2,25 @@
 Changelog for package control_toolbox
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.1.1 (2022-11-05)
+------------------
+* Add declaration of parameters in ROSPid.
+* Fix namespace collision and parameter_callback problems in PidROS
+* Contributors: Aris Synodinos, Denis Štogl
+
+2.1.0 (2022-06-30)
+------------------
+* Fix parameter loading log levels
+* Support pass in a precomputed derivative error
+* Add getParametersCallbackHandle function
+* Add topic_prefix\_ to declareParam & setParameter
+* Update include/control_toolbox/dither.hpp
+* Correct contributing and license files for ament_copyright.
+* Added license text file and contributing guidelines, corrected license short identifier.
+* Remove build of downstream workspace.
+* Update CI config and add pre-commit-config.
+* Contributors: Bence Magyar, ChenJun, Denis Štogl, Timon Engelke
+
 2.0.2 (2021-05-25)
 ------------------
 * remove unused variables
